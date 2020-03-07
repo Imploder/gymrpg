@@ -1,5 +1,5 @@
 class Hello:
-    """Class that handles the !hello command"""
+    """Handles the !hello command"""
     @staticmethod
     def hello_there():
         """Returns the hello there Kenobi gif"""
