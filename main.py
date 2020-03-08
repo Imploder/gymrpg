@@ -10,8 +10,9 @@ from models.users import Users
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-MONGO_URL = os.getenv('MONGODB_URI')
+MONGO_URL = os.getenv('HEROKU_MONGNO_URI')
 client = MongoClient(MONGO_URL)
+db_connection = client.heroku_2g8whrvz
 
 bot = commands.Bot(command_prefix='!')
 # Update the database flag
@@ -26,7 +27,8 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
-    user_impl = Users(client)
+    print("Someone Joined!")
+    user_impl = Users(db_connection)
     user_impl.insert_user(member)
 
 
@@ -48,7 +50,7 @@ async def exercises(ctx: commands.Context, search_term=None):
     Executes on the !exercises command
     :param search_term: either a point value or exercise name to search for in the database
     """
-    exercise_impl = Exercises(client)
+    exercise_impl = Exercises(db_connection)
 
     if INSERT_DB:
         exercise_impl.insert_exercises()
@@ -63,7 +65,7 @@ async def exercises(ctx: commands.Context, search_term=None):
 @bot.command(name="stats", help="Displays your stats")
 async def stats(ctx: commands.Context):
     """Gets the current user's stats"""
-    user_impl = Users(client)
+    user_impl = Users(db_connection)
     await ctx.send(user_impl.get_users(ctx.author))
 
 

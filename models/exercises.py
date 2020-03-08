@@ -3,10 +3,10 @@ from pprint import pformat
 
 class Exercises:
     """Handles the !exercises command"""
-    def __init__(self, mongo_connector):
+    def __init__(self, database):
         """Sets up the connection to MongoDB"""
-        self.mongo_connector = mongo_connector
-        self.exercises_db = self.mongo_connector.exercises
+        self.database = database
+        self.exercises_collection = self.database.exercises
 
         # Keep lowercase names
         self.exercises = [
@@ -18,13 +18,13 @@ class Exercises:
     def insert_exercises(self):
         """Inserts exercises into the MongoDB database, should only be done to update"""
         print("Dropping collection")
-        self.exercises_db.exercises.drop()
+        self.exercises_collection.drop()
         print("Adding Exercises")
-        self.exercises_db.exercises.insert_many(self.exercises)
+        self.exercises_collection.insert_many(self.exercises)
 
     def get_exercises(self):
         """Returns all exercises from the exercises collection"""
-        response = [x for x in self.exercises_db.exercises.find({}, {"_id": 0})]
+        response = [x for x in self.exercises_collection.find({}, {"_id": 0})]
         return pformat(response)
 
     def query_exercises(self, search_term):
@@ -34,12 +34,12 @@ class Exercises:
         """
         if search_term.isnumeric():
             query = {'points': int(search_term)}
-            response = [x for x in self.exercises_db.exercises.find(query, {"_id": 0, "name": 1})]
+            response = [x for x in self.exercises_collection.find(query, {"_id": 0, "name": 1})]
 
         else:
             search_term = search_term.lower()
             query = {'name': {'$regex': f'^.*{search_term}.*$'}}
-            response = [x for x in self.exercises_db.exercises.find(query, {"_id": 0})]
+            response = [x for x in self.exercises_collection.find(query, {"_id": 0})]
 
         return pformat(response)
 
