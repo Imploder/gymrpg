@@ -4,7 +4,9 @@ from discord.ext import commands
 from pymongo import MongoClient
 
 from commands.hello import Hello
+from commands.code import Code
 from models.exercises import Exercises
+from models.users import Users
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -22,28 +24,47 @@ async def on_ready():
     print(f"{bot.user.name} is ready to receive commands")
 
 
+@bot.event
+async def on_member_join(member):
+    user_impl = Users(client)
+    user_impl.insert_user(member)
+
+
 @bot.command(name="hello", help='Says hello!')
-async def display_stats(ctx: commands.Context):
+async def hello(ctx: commands.Context):
     """Executes on the !hello command"""
     await ctx.send(Hello.hello_there())
 
 
+@bot.command(name="code", help='Provides the github link to the source code')
+async def code(ctx: commands.Context):
+    """Executes on the !code command"""
+    await ctx.send(Code.code())
+
+
 @bot.command(name="exercises", help="Lists all exercises")
-async def display_exercises(ctx: commands.Context, arg=None):
+async def exercises(ctx: commands.Context, search_term=None):
     """
     Executes on the !exercises command
-    :param arg: either a point value or exercise name to search for in the database
+    :param search_term: either a point value or exercise name to search for in the database
     """
-    exercises = Exercises(client)
+    exercise_impl = Exercises(client)
 
     if INSERT_DB:
-        exercises.insert_exercises()
+        exercise_impl.insert_exercises()
 
-    if arg is None:
-        await ctx.send(exercises.get_exercises())
+    if search_term is None:
+        await ctx.send(exercise_impl.get_exercises())
 
-    if arg is not None:
-        await ctx.send(exercises.query_exercises(arg))
+    if search_term is not None:
+        await ctx.send(exercise_impl.query_exercises(search_term))
+
+
+@bot.command(name="stats", help="Displays your stats")
+async def stats(ctx: commands.Context):
+    """Gets the current user's stats"""
+    user_impl = Users(client)
+    await ctx.send(user_impl.get_users(ctx.author))
 
 
 bot.run(TOKEN)
