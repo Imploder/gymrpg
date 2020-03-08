@@ -7,7 +7,7 @@ class Users:
         self.users_db = mongo_connector.users
 
     def get_users(self, user):
-        """Returns all exercises from the users collection"""
+        """Returns the current user's object from the users collection"""
         response = [x for x in self.users_db.users.find({'username': user.display_name}, {"_id": 0})]
         return pformat(response)
 
