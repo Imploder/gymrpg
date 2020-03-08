@@ -10,7 +10,7 @@ from models.users import Users
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-MONGO_URL = os.getenv('MONGODB_URL')
+MONGO_URL = os.getenv('MONGODB_URI')
 client = MongoClient(MONGO_URL)
 
 bot = commands.Bot(command_prefix='!')
